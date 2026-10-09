@@ -37,6 +37,7 @@ tank and the sprinkler are new blocks). For a LAN game, both players put the jar
   you at least one seed back. Sneak to use your item instead.
 - **Water tank and sprinkler.** The sprinkler waters a 9×9 field like rain and keeps the farmland wet with no water
   around. It turns itself off when it rains on it.
+- **Copper bucket.** Carries 5 buckets of water, enough to fill a tank in one go.
 
 Applies to wheat, carrots, potatoes, beetroots, torchflowers, pitcher plants and melon and pumpkin stems (on stems,
 also to growing the fruit). Quality and right-click harvest are for wheat, carrots, potatoes and beetroots.
@@ -100,10 +101,20 @@ at crop height.
 - **Uses water only while the chunk is active**, which is when crops grow. Skipping the night in a bed uses the water
   for those hours at once.
 
+## Copper bucket
+
+A bucket for farmers: it carries **5 buckets of water**, exactly one water tank. Right-click a water source once for
+each bucket, and the glass gauge on the front fills up one line at a time. It pours into tanks (as much as fits, the
+rest stays in the bucket) and fills or empties cauldrons like an iron bucket, but it never places water in the world.
+Empty copper buckets stack to 16.
+
+![The copper bucket in the hotbar: empty, then holding 1 to 5 buckets of water](docs/images/copper-buckets.png)
+
 | Recipe | Shape |
 | --- | --- |
 | Water Tank | copper ingots in the corners, glass on the sides, empty center (where the water goes) |
 | Sprinkler | copper grate on top, a copper ingot in the middle, 3 copper ingots at the bottom |
+| Copper Bucket | 5 copper ingots in a U |
 
 ## Commands and config
 
@@ -154,7 +165,8 @@ beehives, an excellent field and a sprinkler on dry farmland. It checks the mult
 rain, grows crops from seed, harvests with right-click, checks drops, water use, a skipped night and the sprinkler
 turning off in the rain. Screenshots go to `build/run/clientGameTest/screenshots`.
 
-The water tank textures and its 64 models (water height × tank above × tank below) come from `tools/GenAssets.java`:
+The water tank textures, its 64 models (water height × tank above × tank below) and the copper bucket textures come
+from `tools/GenAssets.java`:
 
 ```bash
 java tools/GenAssets.java
