@@ -41,9 +41,9 @@ tank and the sprinkler are new blocks). For a LAN game, both players put the jar
 Applies to wheat, carrots, potatoes, beetroots, torchflowers, pitcher plants and melon and pumpkin stems (on stems,
 also to growing the fruit). Quality and right-click harvest are for wheat, carrots, potatoes and beetroots.
 
-| Water tanks, from full to empty | An excellent wheat sparkling |
+| Water tanks: a column of four, and single ones from full to empty | An excellent wheat sparkling |
 | --- | --- |
-| ![Four water tanks with copper corners, holding different amounts of water](docs/images/tanks.png) | ![Ripe wheat with golden sparkles, next to five beehives](docs/images/excellent-wheat.png) |
+| ![A tall column of four water tanks half full, next to four single tanks with different amounts of water](docs/images/tanks.png) | ![Ripe wheat with golden sparkles, next to five beehives](docs/images/excellent-wheat.png) |
 
 ## Growth
 
@@ -91,6 +91,9 @@ at crop height.
 - **Water tank.** Glass with copper corners. Right-click with a water bucket to add one day of watering; it holds 5
   buckets (5 in-game days, about 1h40 of play). You can see the water go down inside the glass, and a comparator
   reads the level.
+- **Stack tanks for more water.** Tanks placed on top of each other become one tall tank, with no height limit: the
+  copper frame only goes around the whole column, each block adds 5 buckets, and a bucket on any block fills the
+  column from the bottom. Dig the column down under your field to hide the extra capacity.
 - **Sprinkler.** With water in the tank below, it waters a 9×9 square (one block up or down too): it counts as rain
   for growth and quality and keeps the farmland wet. It sprays water in a spiral.
 - **Turns off in the rain** and uses no water while off. Inside a glass greenhouse it never gets rain, so it stays on.
@@ -132,6 +135,9 @@ your `logs/latest.log` and what `/bvc` says about the crop.
 - **Sprinklers** add themselves to an in-memory index when their block entity loads and leave it when it unloads, so
   a crop or farmland asks "is a working sprinkler near me?" without scanning blocks. Water use follows the day clock,
   so a night skipped in bed is charged at once.
+- **Tank columns** have no controller block: every tank keeps its own water, buckets fill from the bottom up and the
+  sprinkler drinks from the top down, so the water always rests at the bottom. Breaking a tank in the middle splits
+  the column and only that block's water is lost.
 
 ## Building from source
 
@@ -148,7 +154,7 @@ beehives, an excellent field and a sprinkler on dry farmland. It checks the mult
 rain, grows crops from seed, harvests with right-click, checks drops, water use, a skipped night and the sprinkler
 turning off in the rain. Screenshots go to `build/run/clientGameTest/screenshots`.
 
-The water tank textures and its 16 models (one per water height) come from `tools/GenAssets.java`:
+The water tank textures and its 64 models (water height × tank above × tank below) come from `tools/GenAssets.java`:
 
 ```bash
 java tools/GenAssets.java

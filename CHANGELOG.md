@@ -8,5 +8,5 @@
   extra product and excellent gives two. Excellent crops sparkle when ripe.
 - Right-click a ripe crop to harvest and replant it.
 - Water tank and sprinkler: the sprinkler waters a 9×9 field like rain and keeps the farmland wet, using water
-  from the tank below.
+  from the tank below. Stacked tanks join into one tall tank with no height limit.
 - `/bvc` shows what is affecting the crop you are looking at.
