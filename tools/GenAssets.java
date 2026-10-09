@@ -95,7 +95,7 @@ public class GenAssets {
 		"...O........O...",
 		"..OOOOOOOOOOOO..",
 		"..OIIIIIIIIIIO..",
-		"..OHCCCGGCCCDO..",
+		"..OHCCCCCCCCDO..",
 		"...OHCCGGCCDO...",
 		"...OHCCGGCCDO...",
 		"...OHCCGGCCDO...",
@@ -130,6 +130,12 @@ public class GenAssets {
 		}
 		String name = level == 0 ? "copper_bucket" : "water_copper_bucket_" + level;
 		ImageIO.write(img, "png", ASSETS.resolve("textures/item/" + name + ".png").toFile());
+	}
+
+	/** Plano fino com uma face só, virada para dentro do tanque. */
+	static String inner(String from, String to, String face, String texture) {
+		return String.format(",\n\t\t{\n\t\t\t\"from\": %s,\n\t\t\t\"to\": %s,\n\t\t\t\"faces\": {\n\t\t\t\t\"%s\": { \"texture\": \"%s\" }\n\t\t\t}\n\t\t}",
+			from, to, face, texture);
 	}
 
 	/**
@@ -175,6 +181,13 @@ public class GenAssets {
 			faces.append(faces.isEmpty() ? "" : ",\n").append(String.format("\t\t\t\t\"%s\": { \"texture\": \"#side\", \"cullface\": \"%s\" }", dir, dir));
 		}
 		sb.append(faces).append("\n\t\t\t}\n\t\t}");
+		// o mesmo vidro virado para dentro: olhando de cima por dentro da coluna, as paredes aparecem
+		sb.append(inner("[0, 0, 0.01]", "[16, 16, 0.01]", "south", "#side"));
+		sb.append(inner("[0, 0, 15.99]", "[16, 16, 15.99]", "north", "#side"));
+		sb.append(inner("[0.01, 0, 0]", "[0.01, 16, 16]", "east", "#side"));
+		sb.append(inner("[15.99, 0, 0]", "[15.99, 16, 16]", "west", "#side"));
+		if (!up) sb.append(inner("[0, 15.99, 0]", "[16, 15.99, 16]", "down", "#cap"));
+		if (!down) sb.append(inner("[0, 0.01, 0]", "[16, 0.01, 16]", "up", "#cap"));
 		if (level > 0) {
 			// a água encosta no vidro (só um décimo de pixel de folga, para os dois não brigarem na tela), senão sobra
 			// um vão em volta e o tanque cheio parece faltar um pedaço
