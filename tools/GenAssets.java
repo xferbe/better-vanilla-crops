@@ -27,6 +27,8 @@ public class GenAssets {
 		texture("water_tank_side_bottom", false, true);
 		texture("water_tank_side_middle", false, false);
 		water();
+		Files.createDirectories(ASSETS.resolve("textures/item"));
+		for (int level = 0; level <= 5; level++) bucket(level);
 		try (var old = Files.list(ASSETS.resolve("models/block"))) {
 			for (Path p : old.toList()) if (p.getFileName().toString().startsWith("water_tank_")) Files.delete(p);
 		}
@@ -82,6 +84,52 @@ public class GenAssets {
 			}
 		}
 		ImageIO.write(img, "png", ASSETS.resolve("textures/block/" + name + ".png").toFile());
+	}
+
+	/** Desenho do balde: O contorno, H brilho, C cobre, D sombra, I boca, G visor de vidro. */
+	static final String[] BUCKET = {
+		"................",
+		"................",
+		".....OOOOOO.....",
+		"....O......O....",
+		"...O........O...",
+		"..OOOOOOOOOOOO..",
+		"..OIIIIIIIIIIO..",
+		"..OHCCCGGCCCDO..",
+		"...OHCCGGCCDO...",
+		"...OHCCGGCCDO...",
+		"...OHCCGGCCDO...",
+		"...OHCCGGCCDO...",
+		"....OHCGGCDO....",
+		"....OOOOOOOO....",
+		"................",
+		"................",
+	};
+
+	/**
+	 * Balde de cobre com {@code level} baldes de água (0 = vazio). A boca fica azul com qualquer água, e o visor de
+	 * vidro na frente acende de baixo para cima, uma linha por balde.
+	 */
+	static void bucket(int level) throws IOException {
+		BufferedImage img = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+		// linhas do visor de baixo (12) para cima (8): o nível n acende as n de baixo
+		for (int y = 0; y < 16; y++) {
+			for (int x = 0; x < 16; x++) {
+				char c = BUCKET[y].charAt(x);
+				int color = switch (c) {
+					case 'O' -> argb(255, 0x6E3420);
+					case 'H' -> argb(255, 0xFC9982);
+					case 'C' -> argb(255, 0xE77C56);
+					case 'D' -> argb(255, 0xA54E2E);
+					case 'I' -> level > 0 ? argb(255, (x + y) % 3 == 0 ? 0x5A8FF0 : 0x3F76E4) : argb(255, 0x4A2416);
+					case 'G' -> 12 - y < level ? argb(255, x == 7 ? 0x5A8FF0 : 0x3F76E4) : argb(255, x == 7 ? 0xD6F1F5 : 0xA9C9CF);
+					default -> 0;
+				};
+				img.setRGB(x, y, color);
+			}
+		}
+		String name = level == 0 ? "copper_bucket" : "water_copper_bucket_" + level;
+		ImageIO.write(img, "png", ASSETS.resolve("textures/item/" + name + ".png").toFile());
 	}
 
 	/** Água azul translúcida com ondas que andam: 8 quadros, interpolados. */

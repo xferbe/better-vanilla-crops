@@ -1,0 +1,48 @@
+{
+	"model": {
+		"type": "minecraft:select",
+		"property": "minecraft:component",
+		"component": "better_vanilla_crops:water_level",
+		"cases": [
+			{
+				"when": 1,
+				"model": {
+					"type": "minecraft:model",
+					"model": "better_vanilla_crops:item/water_copper_bucket_1"
+				}
+			},
+			{
+				"when": 2,
+				"model": {
+					"type": "minecraft:model",
+					"model": "better_vanilla_crops:item/water_copper_bucket_2"
+				}
+			},
+			{
+				"when": 3,
+				"model": {
+					"type": "minecraft:model",
+					"model": "better_vanilla_crops:item/water_copper_bucket_3"
+				}
+			},
+			{
+				"when": 4,
+				"model": {
+					"type": "minecraft:model",
+					"model": "better_vanilla_crops:item/water_copper_bucket_4"
+				}
+			},
+			{
+				"when": 5,
+				"model": {
+					"type": "minecraft:model",
+					"model": "better_vanilla_crops:item/water_copper_bucket_5"
+				}
+			}
+		],
+		"fallback": {
+			"type": "minecraft:model",
+			"model": "better_vanilla_crops:item/water_copper_bucket_1"
+		}
+	}
+}

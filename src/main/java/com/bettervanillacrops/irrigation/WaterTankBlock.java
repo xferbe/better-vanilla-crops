@@ -76,6 +76,7 @@ public class WaterTankBlock extends Block implements EntityBlock {
 	@Override
 	protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
 		InteractionHand hand, BlockHitResult hit) {
+		if (stack.is(ModBlocks.WATER_COPPER_BUCKET)) return pourCopperBucket(stack, level, pos, player, hand);
 		if (!stack.is(Items.WATER_BUCKET)) return InteractionResult.TRY_WITH_EMPTY_HAND;
 		if (!(level.getBlockEntity(pos) instanceof WaterTankBlockEntity) || WaterTankBlockEntity.isColumnFull(level, pos)) {
 			return InteractionResult.TRY_WITH_EMPTY_HAND;
@@ -84,6 +85,25 @@ public class WaterTankBlock extends Block implements EntityBlock {
 			WaterTankBlockEntity.fillColumn(level, pos, WaterTankBlockEntity.BUCKET);
 			player.setItemInHand(hand, ItemUtils.createFilledResult(stack, player, new ItemStack(Items.BUCKET)));
 			level.playSound(null, pos, SoundEvents.BUCKET_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
+			level.gameEvent(player, GameEvent.FLUID_PLACE, pos);
+		}
+		return InteractionResult.SUCCESS;
+	}
+
+	/** Despeja o balde de cobre balde por balde até ele esvaziar ou a coluna encher; o que sobrar fica no balde. */
+	private InteractionResult pourCopperBucket(ItemStack stack, Level level, BlockPos pos, Player player, InteractionHand hand) {
+		if (!(level.getBlockEntity(pos) instanceof WaterTankBlockEntity) || WaterTankBlockEntity.isColumnFull(level, pos)) {
+			return InteractionResult.TRY_WITH_EMPTY_HAND;
+		}
+		if (!level.isClientSide()) {
+			int water = CopperBucketItem.water(stack);
+			int poured = 0;
+			while (poured < water && !WaterTankBlockEntity.isColumnFull(level, pos)) {
+				WaterTankBlockEntity.fillColumn(level, pos, WaterTankBlockEntity.BUCKET);
+				poured++;
+			}
+			if (!player.getAbilities().instabuild) player.setItemInHand(hand, CopperBucketItem.withWater(water - poured));
+			level.playSound(null, pos, SoundEvents.BUCKET_EMPTY, SoundSource.BLOCKS, 1.0F, 0.9F);
 			level.gameEvent(player, GameEvent.FLUID_PLACE, pos);
 		}
 		return InteractionResult.SUCCESS;

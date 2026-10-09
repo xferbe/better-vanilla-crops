@@ -1,5 +1,7 @@
 {
 	"block.better_vanilla_crops.water_tank": "Tanque de Água",
 	"block.better_vanilla_crops.sprinkler": "Sprinkler",
-	"subtitles.better_vanilla_crops.block.sprinkler.spray": "Sprinkler molha"
+	"subtitles.better_vanilla_crops.block.sprinkler.spray": "Sprinkler molha",
+	"item.better_vanilla_crops.copper_bucket": "Balde de Cobre",
+	"item.better_vanilla_crops.water_copper_bucket": "Balde de Cobre com Água"
 }

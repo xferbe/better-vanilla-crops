@@ -1,0 +1,6 @@
+{
+	"parent": "minecraft:item/generated",
+	"textures": {
+		"layer0": "better_vanilla_crops:item/water_copper_bucket_4"
+	}
+}
