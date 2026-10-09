@@ -1,0 +1,60 @@
+plugins {
+	id 'net.fabricmc.fabric-loom' version "${loom_version}"
+}
+
+base {
+	archivesName = 'better-vanilla-crops'
+}
+
+loom {
+	splitEnvironmentSourceSets()
+
+	mods {
+		"better_vanilla_crops" {
+			sourceSet sourceSets.main
+			sourceSet sourceSets.client
+		}
+	}
+}
+
+// Teste automático: abre o jogo, monta as hortas e confere os fatores (./gradlew runClientGameTest)
+fabricApi {
+	configureTests {
+		createSourceSet = true
+		modId = 'better_vanilla_crops_test'
+		enableGameTests = false
+		enableClientGameTests = true
+		eula = false
+	}
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+}
+
+processResources {
+	def version = project.version
+	inputs.property "version", version
+
+	filesMatching("fabric.mod.json") {
+		expand "version": version
+	}
+}
+
+jar {
+	from("LICENSE") {
+		rename { "LICENSE_better_vanilla_crops" }
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = 25
+	it.options.encoding = 'UTF-8'
+}
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
+}
