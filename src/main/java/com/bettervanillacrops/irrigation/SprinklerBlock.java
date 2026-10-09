@@ -28,8 +28,8 @@ public class SprinklerBlock extends Block implements EntityBlock {
 	public static final BooleanProperty ACTIVE = BlockStateProperties.ENABLED;
 	private static final VoxelShape SHAPE = Shapes.or(
 		Block.box(4, 0, 4, 12, 2, 12),
-		Block.box(7, 2, 7, 9, 11, 9),
-		Block.box(5, 11, 5, 11, 14, 11));
+		Block.box(7, 2, 7, 9, 5, 9),
+		Block.box(5, 5, 5, 11, 8, 11));
 
 	public SprinklerBlock(BlockBehaviour.Properties properties) {
 		super(properties);
