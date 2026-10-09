@@ -122,6 +122,7 @@ public class BetterVanillaCropsClientTest implements FabricClientGameTest {
 
 			qualityTests(server, failures);
 			sprinklerTests(ctx, server, failures);
+			columnTests(ctx, server, failures);
 
 			server.runCommand("gamemode spectator @a");
 			server.runCommand(cmd("tp @a 30 %d -24 0 45", Y + 26));
@@ -138,7 +139,10 @@ public class BetterVanillaCropsClientTest implements FabricClientGameTest {
 			for (int i = 0; i < levels.length; i++) {
 				server.runCommand(cmd("setblock %d %d 8 better_vanilla_crops:water_tank[level=%d]", 297 + 2 * i, Y + 1, levels[i]));
 			}
-			server.runCommand(cmd("tp @a 300.5 %.1f 4.5 0 20", Y + 2.8));
+			// e uma coluna de 4 tanques com 12 baldes: dois cheios, um com 2/5 e o de cima vazio
+			for (int y = 1; y <= 4; y++) server.runCommand(cmd("setblock 306 %d 8 better_vanilla_crops:water_tank", Y + y));
+			server.runOnServer(s -> WaterTankBlockEntity.fillColumn(s.overworld(), new BlockPos(306, Y + 4, 8), 12 * WaterTankBlockEntity.BUCKET));
+			server.runCommand(cmd("tp @a 301.5 %.1f 1.0 0 10", Y + 3.0));
 			ctx.waitTicks(15);
 			ctx.takeScreenshot("05-tanques");
 			server.runCommand(cmd("tp @a 302.2 %.1f -2.0 45 30", Y + 2.6));
@@ -269,6 +273,62 @@ public class BetterVanillaCropsClientTest implements FabricClientGameTest {
 		long skipped = server.computeOnServer(s -> tank(s.overworld()).water());
 		LogUtils.getLogger().info("[teste] gasto com 1000 tiques pulados: {}", after - skipped);
 		if (after - skipped < 1000) failures.add("pular 1000 tiques do dia deveria gastar pelo menos 1000 de água, gastou " + (after - skipped));
+	}
+
+	/**
+	 * Coluna de 3 tanques com sprinkler em cima: os blocos se reconhecem, 7 baldes enchem de baixo para cima, o
+	 * sprinkler bebe do bloco do meio (o de cima está vazio) e, quebrando o do meio, a coluna se divide.
+	 */
+	private static void columnTests(ClientGameTestContext ctx, TestServerContext server, List<String> failures) {
+		BlockPos bottom = new BlockPos(312, Y + 1, -8), middle = bottom.above(), top = middle.above();
+		for (BlockPos p : new BlockPos[] {bottom, middle, top}) {
+			server.runCommand(cmd("setblock %d %d %d better_vanilla_crops:water_tank", p.getX(), p.getY(), p.getZ()));
+		}
+		server.runCommand(cmd("setblock %d %d %d better_vanilla_crops:sprinkler", top.getX(), top.getY() + 1, top.getZ()));
+		String filled = server.computeOnServer(s -> {
+			ServerLevel level = s.overworld();
+			List<String> out = new ArrayList<>();
+			BlockState b = level.getBlockState(bottom), m = level.getBlockState(middle), t = level.getBlockState(top);
+			if (b.getValue(WaterTankBlock.DOWN) || !b.getValue(WaterTankBlock.UP)) out.add("tanque de baixo deveria ligar só para cima: " + b);
+			if (!m.getValue(WaterTankBlock.DOWN) || !m.getValue(WaterTankBlock.UP)) out.add("tanque do meio deveria ligar para os dois lados: " + m);
+			if (!t.getValue(WaterTankBlock.DOWN) || t.getValue(WaterTankBlock.UP)) out.add("tanque de cima deveria ligar só para baixo: " + t);
+			ServerPlayer player = s.getPlayerList().getPlayers().getFirst();
+			for (int i = 0; i < 7; i++) {
+				player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.WATER_BUCKET));
+				level.getBlockState(middle).useItemOn(player.getMainHandItem(), level, player, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(middle), Direction.NORTH, middle, false));
+			}
+			long wb = water(level, bottom), wm = water(level, middle), wt = water(level, top);
+			LogUtils.getLogger().info("[teste] coluna com 7 baldes: baixo {}, meio {}, cima {}", wb, wm, wt);
+			if (wb != WaterTankBlockEntity.CAPACITY || wm != 2 * WaterTankBlockEntity.BUCKET || wt != 0) {
+				out.add("7 baldes deveriam encher o de baixo (5) e pôr 2 no do meio, veio " + wb + " / " + wm + " / " + wt);
+			}
+			return String.join("\n", out);
+		});
+		if (!filled.isEmpty()) failures.add(filled);
+
+		ctx.waitTicks(40);
+		String drained = server.computeOnServer(s -> {
+			ServerLevel level = s.overworld();
+			List<String> out = new ArrayList<>();
+			boolean on = level.getBlockState(top.above()).getValue(SprinklerBlock.ACTIVE);
+			long used = 2 * WaterTankBlockEntity.BUCKET - water(level, middle);
+			LogUtils.getLogger().info("[teste] coluna: sprinkler ligado={}, gasto do meio {}, baixo {}", on, used, water(level, bottom));
+			if (!on) out.add("sprinkler em cima de coluna com água embaixo deveria ligar");
+			if (used < 30 || used > 50) out.add("o sprinkler deveria beber do tanque do meio (~40 em 40 tiques), bebeu " + used);
+			if (water(level, bottom) != WaterTankBlockEntity.CAPACITY) out.add("o tanque de baixo não deveria perder água antes do de cima");
+
+			level.destroyBlock(middle, false);
+			BlockState b = level.getBlockState(bottom), t = level.getBlockState(top);
+			if (b.getValue(WaterTankBlock.UP) || t.getValue(WaterTankBlock.DOWN)) out.add("quebrando o do meio, a coluna deveria se dividir: " + b + " / " + t);
+			if (water(level, bottom) != WaterTankBlockEntity.CAPACITY) out.add("o tanque de baixo deveria manter a água depois de dividir");
+			return String.join("\n", out);
+		});
+		if (!drained.isEmpty()) failures.add(drained);
+	}
+
+	private static long water(ServerLevel level, BlockPos pos) {
+		return ((WaterTankBlockEntity) level.getBlockEntity(pos)).water();
 	}
 
 	/** Chovendo no sprinkler: desliga e para de gastar. */
