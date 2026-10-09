@@ -8,6 +8,8 @@ import com.bettervanillacrops.CropQuality;
 import com.bettervanillacrops.GrowthFactors;
 import com.bettervanillacrops.Harvest;
 import com.bettervanillacrops.irrigation.ModBlocks;
+import com.bettervanillacrops.irrigation.CopperBucketItem;
+import net.minecraft.world.level.block.Blocks;
 import com.bettervanillacrops.irrigation.SprinklerBlock;
 import com.bettervanillacrops.irrigation.WaterTankBlock;
 import com.bettervanillacrops.irrigation.WaterTankBlockEntity;
@@ -123,6 +125,7 @@ public class BetterVanillaCropsClientTest implements FabricClientGameTest {
 			qualityTests(server, failures);
 			sprinklerTests(ctx, server, failures);
 			columnTests(ctx, server, failures);
+			copperBucketTests(server, failures);
 
 			server.runCommand("gamemode spectator @a");
 			server.runCommand(cmd("tp @a 30 %d -24 0 45", Y + 26));
@@ -148,6 +151,16 @@ public class BetterVanillaCropsClientTest implements FabricClientGameTest {
 			server.runCommand(cmd("tp @a 302.2 %.1f -2.0 45 30", Y + 2.6));
 			ctx.waitTicks(10);
 			ctx.takeScreenshot("06-sprinkler-de-perto");
+			// hotbar com o balde de cobre vazio e com 1 a 5 baldes de água
+			server.runCommand("gamemode creative @a");
+			server.runOnServer(s -> {
+				ServerPlayer player = s.getPlayerList().getPlayers().getFirst();
+				for (int i = 0; i <= 5; i++) player.getInventory().setItem(i, CopperBucketItem.withWater(i));
+				player.getInventory().setSelectedSlot(8);
+			});
+			ctx.waitTicks(10);
+			ctx.takeScreenshot("07-baldes-de-cobre");
+			server.runCommand("gamemode spectator @a");
 
 			server.runCommand("weather rain");
 			ctx.waitTicks(120);
@@ -325,6 +338,60 @@ public class BetterVanillaCropsClientTest implements FabricClientGameTest {
 			return String.join("\n", out);
 		});
 		if (!drained.isEmpty()) failures.add(drained);
+	}
+
+	/**
+	 * Balde de cobre: 5 cliques numa fonte enchem 5 baldes (o 6º não pega), despeja tudo num tanque novo de uma vez,
+	 * enche um caldeirão gastando 1 e esvazia um caldeirão cheio ganhando 1.
+	 */
+	private static void copperBucketTests(TestServerContext server, List<String> failures) {
+		BlockPos source = new BlockPos(316, Y, 12), tank = new BlockPos(318, Y + 1, 12), cauldron = new BlockPos(320, Y + 1, 12);
+		server.runCommand(cmd("setblock %d %d %d better_vanilla_crops:water_tank", tank.getX(), tank.getY(), tank.getZ()));
+		server.runCommand(cmd("setblock %d %d %d cauldron", cauldron.getX(), cauldron.getY(), cauldron.getZ()));
+		String result = server.computeOnServer(s -> {
+			ServerLevel level = s.overworld();
+			List<String> out = new ArrayList<>();
+			if (s.getRecipeManager().byKey(ResourceKey.create(Registries.RECIPE, BetterVanillaCrops.id("copper_bucket"))).isEmpty()) out.add("receita do balde de cobre não carregou");
+			ServerPlayer player = s.getPlayerList().getPlayers().getFirst();
+			player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+			player.setItemInHand(InteractionHand.MAIN_HAND, CopperBucketItem.withWater(0));
+			// olhando reto para baixo, em cima da fonte
+			player.teleportTo(source.getX() + 0.5, source.getY() + 1.2, source.getZ() + 0.5);
+			player.setXRot(90.0F);
+			for (int i = 0; i < 6; i++) {
+				level.setBlock(source, Blocks.WATER.defaultBlockState(), Block.UPDATE_ALL);
+				ItemStack held = player.getMainHandItem();
+				var r = held.use(level, player, InteractionHand.MAIN_HAND);
+				if (r instanceof net.minecraft.world.InteractionResult.Success success && success.heldItemTransformedTo() != null) {
+					player.setItemInHand(InteractionHand.MAIN_HAND, success.heldItemTransformedTo());
+				}
+			}
+			int filled = CopperBucketItem.water(player.getMainHandItem());
+			LogUtils.getLogger().info("[teste] balde de cobre depois de 6 cliques na fonte: {} balde(s), item {}", filled, player.getMainHandItem());
+			if (filled != 5) out.add("6 cliques na fonte deveriam parar em 5 baldes, ficou " + filled);
+
+			level.getBlockState(tank).useItemOn(player.getMainHandItem(), level, player, InteractionHand.MAIN_HAND,
+				new BlockHitResult(Vec3.atCenterOf(tank), Direction.NORTH, tank, false));
+			long inTank = water(level, tank);
+			LogUtils.getLogger().info("[teste] balde de cobre no tanque: {} de água, sobrou {}", inTank, player.getMainHandItem());
+			if (inTank != WaterTankBlockEntity.CAPACITY) out.add("o balde de cobre cheio deveria encher o tanque inteiro, pôs " + inTank);
+			if (!player.getMainHandItem().is(ModBlocks.COPPER_BUCKET)) out.add("depois de despejar tudo deveria sobrar o balde vazio, sobrou " + player.getMainHandItem());
+
+			player.setItemInHand(InteractionHand.MAIN_HAND, CopperBucketItem.withWater(2));
+			BlockHitResult onCauldron = new BlockHitResult(Vec3.atCenterOf(cauldron), Direction.UP, cauldron, false);
+			player.getMainHandItem().useOn(new net.minecraft.world.item.context.UseOnContext(player, InteractionHand.MAIN_HAND, onCauldron));
+			BlockState c = level.getBlockState(cauldron);
+			int afterFill = CopperBucketItem.water(player.getMainHandItem());
+			boolean full = c.is(Blocks.WATER_CAULDRON) && c.getValue(net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL) == 3;
+			player.getMainHandItem().useOn(new net.minecraft.world.item.context.UseOnContext(player, InteractionHand.MAIN_HAND, onCauldron));
+			int afterTake = CopperBucketItem.water(player.getMainHandItem());
+			boolean emptied = level.getBlockState(cauldron).is(Blocks.CAULDRON);
+			LogUtils.getLogger().info("[teste] caldeirão: encheu={} (balde {}), esvaziou={} (balde {})", full, afterFill, emptied, afterTake);
+			if (!full || afterFill != 1) out.add("balde com 2 deveria encher o caldeirão e ficar com 1: cheio=" + full + ", balde " + afterFill);
+			if (!emptied || afterTake != 2) out.add("balde com 1 deveria esvaziar o caldeirão cheio e ficar com 2: vazio=" + emptied + ", balde " + afterTake);
+			return String.join("\n", out);
+		});
+		if (!result.isEmpty()) failures.add(result);
 	}
 
 	private static long water(ServerLevel level, BlockPos pos) {
