@@ -1,0 +1,18 @@
+{
+	"required": true,
+	"package": "com.bettervanillacrops.mixin",
+	"compatibilityLevel": "JAVA_25",
+	"mixins": [
+		"BlockDropsMixin",
+		"CropBlockMixin",
+		"FarmlandBlockMixin",
+		"PitcherCropBlockMixin",
+		"StemBlockMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"overwrites": {
+		"requireAnnotations": true
+	}
+}

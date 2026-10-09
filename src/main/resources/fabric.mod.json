@@ -1,0 +1,26 @@
+{
+	"schemaVersion": 1,
+	"id": "better_vanilla_crops",
+	"version": "${version}",
+	"name": "Better Vanilla Crops",
+	"description": "Vanilla crops react to their surroundings: sun, rain, snow, flowing water, crop variety and beehives change how fast they grow and how much they yield. Right-click to harvest and replant, and a water tank with a sprinkler waters fields where it never rains. No new crops or foods.",
+	"authors": ["xferbe"],
+	"contact": {
+		"homepage": "https://github.com/xferbe/better-vanilla-crops",
+		"sources": "https://github.com/xferbe/better-vanilla-crops",
+		"issues": "https://github.com/xferbe/better-vanilla-crops/issues"
+	},
+	"license": "MIT",
+	"icon": "assets/better_vanilla_crops/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": ["com.bettervanillacrops.BetterVanillaCrops"]
+	},
+	"mixins": ["better_vanilla_crops.mixins.json"],
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"minecraft": "~26.3",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}
