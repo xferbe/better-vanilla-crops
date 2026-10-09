@@ -148,6 +148,9 @@ public class BetterVanillaCropsClientTest implements FabricClientGameTest {
 			server.runCommand(cmd("tp @a 301.5 %.1f 1.0 0 10", Y + 3.0));
 			ctx.waitTicks(15);
 			ctx.takeScreenshot("05-tanques");
+			server.runCommand(cmd("tp @a 305.0 %.1f 6.3 -34 15", Y + 2.6));
+			ctx.waitTicks(10);
+			ctx.takeScreenshot("05b-coluna-de-perto");
 			server.runCommand(cmd("tp @a 302.2 %.1f -2.0 45 30", Y + 2.6));
 			ctx.waitTicks(10);
 			ctx.takeScreenshot("06-sprinkler-de-perto");
@@ -338,6 +341,20 @@ public class BetterVanillaCropsClientTest implements FabricClientGameTest {
 			return String.join("\n", out);
 		});
 		if (!drained.isEmpty()) failures.add(drained);
+
+		// tanque com 3 baldes no ar; põe outro embaixo e a água tem que descer para ele
+		BlockPos upper = new BlockPos(314, Y + 3, 4), lower = upper.below();
+		server.runCommand(cmd("setblock %d %d %d better_vanilla_crops:water_tank", upper.getX(), upper.getY(), upper.getZ()));
+		server.runOnServer(s -> WaterTankBlockEntity.fillColumn(s.overworld(), upper, 3 * WaterTankBlockEntity.BUCKET));
+		server.runCommand(cmd("setblock %d %d %d better_vanilla_crops:water_tank", lower.getX(), lower.getY(), lower.getZ()));
+		ctx.waitTicks(3);
+		String settled = server.computeOnServer(s -> {
+			ServerLevel level = s.overworld();
+			long wl = water(level, lower), wu = water(level, upper);
+			LogUtils.getLogger().info("[teste] tanque posto embaixo: baixo {}, cima {}", wl, wu);
+			return wl == 3 * WaterTankBlockEntity.BUCKET && wu == 0 ? "" : "a água deveria descer para o tanque novo de baixo: baixo " + wl + ", cima " + wu;
+		});
+		if (!settled.isEmpty()) failures.add(settled);
 	}
 
 	/**
