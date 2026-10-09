@@ -1,0 +1,6 @@
+{
+	"variants": {
+		"enabled=false": { "model": "better_vanilla_crops:block/sprinkler" },
+		"enabled=true": { "model": "better_vanilla_crops:block/sprinkler" }
+	}
+}

@@ -1,0 +1,68 @@
+{
+	"parent": "minecraft:block/block",
+	"textures": {
+		"particle": "minecraft:block/copper_block",
+		"copper": "minecraft:block/copper_block",
+		"grate": "minecraft:block/copper_grate"
+	},
+	"elements": [
+		{
+			"from": [4, 0, 4],
+			"to": [12, 2, 12],
+			"faces": {
+				"down": { "texture": "#copper", "cullface": "down" },
+				"up": { "texture": "#copper" },
+				"north": { "texture": "#copper" },
+				"south": { "texture": "#copper" },
+				"west": { "texture": "#copper" },
+				"east": { "texture": "#copper" }
+			}
+		},
+		{
+			"from": [7, 2, 7],
+			"to": [9, 11, 9],
+			"faces": {
+				"north": { "texture": "#copper" },
+				"south": { "texture": "#copper" },
+				"west": { "texture": "#copper" },
+				"east": { "texture": "#copper" }
+			}
+		},
+		{
+			"from": [5, 11, 5],
+			"to": [11, 14, 11],
+			"faces": {
+				"down": { "texture": "#grate" },
+				"up": { "texture": "#grate" },
+				"north": { "texture": "#grate" },
+				"south": { "texture": "#grate" },
+				"west": { "texture": "#grate" },
+				"east": { "texture": "#grate" }
+			}
+		},
+		{
+			"from": [2, 12, 7.5],
+			"to": [14, 13, 8.5],
+			"faces": {
+				"down": { "texture": "#copper" },
+				"up": { "texture": "#copper" },
+				"north": { "texture": "#copper" },
+				"south": { "texture": "#copper" },
+				"west": { "texture": "#copper" },
+				"east": { "texture": "#copper" }
+			}
+		},
+		{
+			"from": [7.5, 12, 2],
+			"to": [8.5, 13, 14],
+			"faces": {
+				"down": { "texture": "#copper" },
+				"up": { "texture": "#copper" },
+				"north": { "texture": "#copper" },
+				"south": { "texture": "#copper" },
+				"west": { "texture": "#copper" },
+				"east": { "texture": "#copper" }
+			}
+		}
+	]
+}
