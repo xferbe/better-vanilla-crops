@@ -158,6 +158,13 @@ public class BetterVanillaCropsClientTest implements FabricClientGameTest {
 			server.runCommand(cmd("tp @a 309.5 %.1f 13.2 0 62", Y + 2.2));
 			ctx.waitTicks(10);
 			ctx.takeScreenshot("05c-coluna-enterrada-de-cima");
+			// coluna de 2 com o de baixo exatamente cheio e o de cima vazio: a água tem que ter superfície
+			server.runCommand(cmd("setblock 312 %d 14 better_vanilla_crops:water_tank", Y + 1));
+			server.runCommand(cmd("setblock 312 %d 14 better_vanilla_crops:water_tank", Y + 2));
+			server.runOnServer(s -> WaterTankBlockEntity.fillColumn(s.overworld(), new BlockPos(312, Y + 1, 14), WaterTankBlockEntity.CAPACITY));
+			server.runCommand(cmd("tp @a 312.5 %.1f 12.3 0 55", Y + 4.6));
+			ctx.waitTicks(10);
+			ctx.takeScreenshot("05d-coluna-cheio-embaixo-de-cima");
 			server.runCommand(cmd("tp @a 302.2 %.1f -2.0 45 30", Y + 2.6));
 			ctx.waitTicks(10);
 			ctx.takeScreenshot("06-sprinkler-de-perto");
