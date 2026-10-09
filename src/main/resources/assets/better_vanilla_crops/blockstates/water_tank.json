@@ -1,0 +1,20 @@
+{
+	"variants": {
+		"level=0": { "model": "better_vanilla_crops:block/water_tank_0" },
+		"level=1": { "model": "better_vanilla_crops:block/water_tank_1" },
+		"level=2": { "model": "better_vanilla_crops:block/water_tank_2" },
+		"level=3": { "model": "better_vanilla_crops:block/water_tank_3" },
+		"level=4": { "model": "better_vanilla_crops:block/water_tank_4" },
+		"level=5": { "model": "better_vanilla_crops:block/water_tank_5" },
+		"level=6": { "model": "better_vanilla_crops:block/water_tank_6" },
+		"level=7": { "model": "better_vanilla_crops:block/water_tank_7" },
+		"level=8": { "model": "better_vanilla_crops:block/water_tank_8" },
+		"level=9": { "model": "better_vanilla_crops:block/water_tank_9" },
+		"level=10": { "model": "better_vanilla_crops:block/water_tank_10" },
+		"level=11": { "model": "better_vanilla_crops:block/water_tank_11" },
+		"level=12": { "model": "better_vanilla_crops:block/water_tank_12" },
+		"level=13": { "model": "better_vanilla_crops:block/water_tank_13" },
+		"level=14": { "model": "better_vanilla_crops:block/water_tank_14" },
+		"level=15": { "model": "better_vanilla_crops:block/water_tank_15" }
+	}
+}
