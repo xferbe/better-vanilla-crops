@@ -197,11 +197,11 @@ public class GenAssets {
 			double top = bottom + (ceiling - bottom) * level / 15.0;
 			sb.append(String.format(Locale.ROOT, ",\n\t\t{\n\t\t\t\"from\": [%.3f, %.3f, %.3f],\n\t\t\t\"to\": [%.3f, %.3f, %.3f],\n\t\t\t\"faces\": {\n",
 				gap, bottom, gap, 16 - gap, top, 16 - gap));
-			StringBuilder water = new StringBuilder();
-			// a face de cima some quando a água emenda com a do tanque de cima
-			if (!(up && level == 15)) water.append("\t\t\t\t\"up\": { \"texture\": \"#water\" }");
+			// a face de cima fica sempre: o modelo não sabe se o tanque de cima tem água. Se tiver, ela fica escondida
+			// dentro da água opaca dele; sem ela, o bloco cheio embaixo de um vazio ficava sem superfície
+			StringBuilder water = new StringBuilder("\t\t\t\t\"up\": { \"texture\": \"#water\" }");
 			for (String dir : new String[] {"north", "south", "west", "east"}) {
-				water.append(water.isEmpty() ? "" : ",\n").append(String.format("\t\t\t\t\"%s\": { \"texture\": \"#water\" }", dir));
+				water.append(",\n").append(String.format("\t\t\t\t\"%s\": { \"texture\": \"#water\" }", dir));
 			}
 			sb.append(water).append("\n\t\t\t}\n\t\t}");
 		}

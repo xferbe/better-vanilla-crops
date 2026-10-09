@@ -49,6 +49,7 @@
 			"from": [0.100, 0.000, 0.100],
 			"to": [15.900, 16.000, 15.900],
 			"faces": {
+				"up": { "texture": "#water" },
 				"north": { "texture": "#water" },
 				"south": { "texture": "#water" },
 				"west": { "texture": "#water" },
