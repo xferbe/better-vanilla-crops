@@ -82,7 +82,7 @@ public class BetterVanillaCropsClientTest implements FabricClientGameTest {
 			server.runCommand("gamerule random_tick_speed 0");
 			server.runCommand("weather clear");
 
-			server.runCommand("forceload add 100 -20 320 20");
+			server.runCommand("forceload add 100 -20 330 20");
 			for (int x : new int[] {0, 12, 24, 36, 48, 60, 120, 180, 240}) {
 				server.runCommand(cmd("fill %d %d -1 %d %d 1 farmland[moisture=7]", x - 1, Y, x + 1, Y));
 				server.runCommand(cmd("setblock %d %d 0 wheat", x, Y + 1));
@@ -151,6 +151,13 @@ public class BetterVanillaCropsClientTest implements FabricClientGameTest {
 			server.runCommand(cmd("tp @a 305.0 %.1f 6.3 -34 15", Y + 2.6));
 			ctx.waitTicks(10);
 			ctx.takeScreenshot("05b-coluna-de-perto");
+			// coluna de 2 enterrada, só o de baixo com água, vista de cima
+			server.runCommand(cmd("setblock 309 %d 14 better_vanilla_crops:water_tank", Y - 1));
+			server.runCommand(cmd("setblock 309 %d 14 better_vanilla_crops:water_tank", Y));
+			server.runOnServer(s -> WaterTankBlockEntity.fillColumn(s.overworld(), new BlockPos(309, Y, 14), 3 * WaterTankBlockEntity.BUCKET));
+			server.runCommand(cmd("tp @a 309.5 %.1f 13.2 0 62", Y + 2.2));
+			ctx.waitTicks(10);
+			ctx.takeScreenshot("05c-coluna-enterrada-de-cima");
 			server.runCommand(cmd("tp @a 302.2 %.1f -2.0 45 30", Y + 2.6));
 			ctx.waitTicks(10);
 			ctx.takeScreenshot("06-sprinkler-de-perto");
@@ -159,6 +166,8 @@ public class BetterVanillaCropsClientTest implements FabricClientGameTest {
 			server.runOnServer(s -> {
 				ServerPlayer player = s.getPlayerList().getPlayers().getFirst();
 				for (int i = 0; i <= 5; i++) player.getInventory().setItem(i, CopperBucketItem.withWater(i));
+				player.getInventory().setItem(6, new ItemStack(ModBlocks.WATER_TANK));
+				player.getInventory().setItem(7, ModBlocks.fullTank());
 				player.getInventory().setSelectedSlot(8);
 			});
 			ctx.waitTicks(10);
@@ -406,6 +415,18 @@ public class BetterVanillaCropsClientTest implements FabricClientGameTest {
 			LogUtils.getLogger().info("[teste] caldeirão: encheu={} (balde {}), esvaziou={} (balde {})", full, afterFill, emptied, afterTake);
 			if (!full || afterFill != 1) out.add("balde com 2 deveria encher o caldeirão e ficar com 1: cheio=" + full + ", balde " + afterFill);
 			if (!emptied || afterTake != 2) out.add("balde com 1 deveria esvaziar o caldeirão cheio e ficar com 2: vazio=" + emptied + ", balde " + afterTake);
+
+			// tanque cheio do criativo: colocado, já vem com os 5 baldes
+			BlockPos floor = new BlockPos(322, Y, 12), placed = floor.above();
+			player.setItemInHand(InteractionHand.MAIN_HAND, ModBlocks.fullTank());
+			player.getMainHandItem().useOn(new net.minecraft.world.item.context.UseOnContext(player, InteractionHand.MAIN_HAND,
+				new BlockHitResult(Vec3.atCenterOf(floor).add(0, 0.5, 0), Direction.UP, floor, false)));
+			BlockState fullState = level.getBlockState(placed);
+			long fullWater = fullState.is(ModBlocks.WATER_TANK) ? water(level, placed) : -1;
+			LogUtils.getLogger().info("[teste] tanque cheio do criativo: {} de água, {}", fullWater, fullState);
+			if (fullWater != WaterTankBlockEntity.CAPACITY || fullState.getValue(WaterTankBlock.LEVEL) != 15) {
+				out.add("o tanque cheio do criativo deveria nascer com 5 baldes e nível 15: " + fullWater + " / " + fullState);
+			}
 			return String.join("\n", out);
 		});
 		if (!result.isEmpty()) failures.add(result);
