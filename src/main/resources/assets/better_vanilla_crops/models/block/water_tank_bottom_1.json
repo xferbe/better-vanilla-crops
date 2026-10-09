@@ -1,0 +1,33 @@
+{
+	"parent": "minecraft:block/block",
+	"textures": {
+		"particle": "better_vanilla_crops:block/water_tank",
+		"cap": "better_vanilla_crops:block/water_tank",
+		"side": "better_vanilla_crops:block/water_tank_side_bottom",
+		"water": "better_vanilla_crops:block/tank_water"
+	},
+	"elements": [
+		{
+			"from": [0, 0, 0],
+			"to": [16, 16, 16],
+			"faces": {
+				"down": { "texture": "#cap", "cullface": "down" },
+				"north": { "texture": "#side", "cullface": "north" },
+				"south": { "texture": "#side", "cullface": "south" },
+				"west": { "texture": "#side", "cullface": "west" },
+				"east": { "texture": "#side", "cullface": "east" }
+			}
+		},
+		{
+			"from": [1, 1.000, 1],
+			"to": [15, 2.000, 15],
+			"faces": {
+				"up": { "texture": "#water" },
+				"north": { "texture": "#water" },
+				"south": { "texture": "#water" },
+				"west": { "texture": "#water" },
+				"east": { "texture": "#water" }
+			}
+		}
+	]
+}

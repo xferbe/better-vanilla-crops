@@ -13,7 +13,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * Liga com água no tanque de baixo e sem chuva em cima, e gasta um tique de água por tique de jogo — só com o chunk
+ * Liga com água na coluna de tanques de baixo e sem chuva em cima, e gasta um tique de água por tique de jogo — só com o chunk
  * ativo, que é quando as plantas crescem. Quando a noite é pulada dormindo, o relógio do dia salta e o salto é
  * descontado de uma vez.
  */
@@ -53,10 +53,10 @@ public class SprinklerBlockEntity extends BlockEntity {
 		// tique normal anda 1; relógio parado anda 0 e conta 1; noite pulada salta de uma vez (até um dia)
 		long used = jump > 1 && jump <= WaterTankBlockEntity.BUCKET ? jump : 1;
 
-		WaterTankBlockEntity tank = level.getBlockEntity(pos.below()) instanceof WaterTankBlockEntity t ? t : null;
+		// bebe da coluna de tanques embaixo, de cima para baixo
 		boolean raining = level.precipitationAt(pos.above()) != Biome.Precipitation.NONE;
-		boolean active = tank != null && tank.water() > 0 && !raining;
-		if (active) tank.drain(used);
+		boolean active = !raining && WaterTankBlockEntity.hasWaterBelow(level, pos.below());
+		if (active) WaterTankBlockEntity.drainFromTop(level, pos.below(), used);
 		if (state.getValue(SprinklerBlock.ACTIVE) != active) {
 			level.setBlock(pos, state.setValue(SprinklerBlock.ACTIVE, active), Block.UPDATE_CLIENTS);
 		}
@@ -66,7 +66,7 @@ public class SprinklerBlockEntity extends BlockEntity {
 	static void clientTick(Level level, BlockPos pos, BlockState state) {
 		if (!state.getValue(SprinklerBlock.ACTIVE)) return;
 		RandomSource random = level.getRandom();
-		double cx = pos.getX() + 0.5, cz = pos.getZ() + 0.5, top = pos.getY() + 0.9;
+		double cx = pos.getX() + 0.5, cz = pos.getZ() + 0.5, top = pos.getY() + 0.5;
 		double spin = level.getGameTime() * 0.35;
 		for (int arm = 0; arm < 2; arm++) {
 			double angle = spin + arm * Math.PI;

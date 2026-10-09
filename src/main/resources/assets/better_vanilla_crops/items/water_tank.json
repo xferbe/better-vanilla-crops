@@ -1,6 +1,6 @@
 {
 	"model": {
 		"type": "minecraft:model",
-		"model": "better_vanilla_crops:block/water_tank_15"
+		"model": "better_vanilla_crops:block/water_tank_single_15"
 	}
 }
