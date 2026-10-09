@@ -68,6 +68,18 @@ public class WaterTankBlockEntity extends BlockEntity {
 		return out;
 	}
 
+	/** Junta toda a água da coluna e enche de novo de baixo para cima, como se ela tivesse escorrido para o fundo. */
+	public static void settle(Level level, BlockPos pos) {
+		List<WaterTankBlockEntity> tanks = column(level, pos);
+		long left = 0;
+		for (WaterTankBlockEntity tank : tanks) left += tank.water;
+		for (WaterTankBlockEntity tank : tanks) {
+			long here = Math.min(CAPACITY, left);
+			tank.set(here);
+			left -= here;
+		}
+	}
+
 	/** Enche a coluna a partir do fundo. Falso se ela já estava cheia (nada entrou). */
 	public static boolean fillColumn(Level level, BlockPos pos, long amount) {
 		long left = amount;

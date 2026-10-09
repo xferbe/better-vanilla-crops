@@ -4,6 +4,7 @@ import org.jspecify.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.RandomSource;
 import net.minecraft.sounds.SoundSource;
@@ -58,6 +59,18 @@ public class WaterTankBlock extends Block implements EntityBlock {
 		return defaultBlockState()
 			.setValue(UP, level.getBlockState(pos.above()).is(this))
 			.setValue(DOWN, level.getBlockState(pos.below()).is(this));
+	}
+
+	/** Tanque novo encostado na coluna: a água dela se reassenta no fundo no tique seguinte (já com o bloco pronto). */
+	@Override
+	protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
+		super.onPlace(state, level, pos, oldState, movedByPiston);
+		if (!oldState.is(this)) level.scheduleTick(pos, this, 1);
+	}
+
+	@Override
+	protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+		WaterTankBlockEntity.settle(level, pos);
 	}
 
 	@Override
