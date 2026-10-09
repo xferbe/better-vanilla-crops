@@ -132,7 +132,10 @@ public class GenAssets {
 		ImageIO.write(img, "png", ASSETS.resolve("textures/item/" + name + ".png").toFile());
 	}
 
-	/** Água azul translúcida com ondas que andam: 8 quadros, interpolados. */
+	/**
+	 * Água azul com ondas que andam: 8 quadros, interpolados. Opaca de propósito: translúcida, cada face só aparece de
+	 * um lado (a água parecia um plano solto) e a ordem com o vidro do mesmo bloco fazia ela piscar.
+	 */
 	static void water() throws IOException {
 		int frames = 8;
 		BufferedImage img = new BufferedImage(16, 16 * frames, BufferedImage.TYPE_INT_ARGB);
@@ -143,7 +146,7 @@ public class GenAssets {
 					double wave = Math.sin(x * 0.8 + phase) + Math.sin(y * 0.9 - phase * 2 + x * 0.3) * 0.7;
 					double t = (wave + 1.7) / 3.4;
 					int r = (int) (0x2E + (0x5A - 0x2E) * t), g = (int) (0x5F + (0x8F - 0x5F) * t), b = (int) (0xC9 + (0xF0 - 0xC9) * t);
-					img.setRGB(x, f * 16 + y, argb(175, (r << 16) | (g << 8) | b));
+					img.setRGB(x, f * 16 + y, argb(255, (r << 16) | (g << 8) | b));
 				}
 			}
 		}
@@ -173,10 +176,14 @@ public class GenAssets {
 		}
 		sb.append(faces).append("\n\t\t\t}\n\t\t}");
 		if (level > 0) {
-			double bottom = down ? 0 : 1;
-			double ceiling = up ? 16 : 15;
+			// a água encosta no vidro (só um décimo de pixel de folga, para os dois não brigarem na tela), senão sobra
+			// um vão em volta e o tanque cheio parece faltar um pedaço
+			double gap = 0.1;
+			double bottom = down ? 0 : gap;
+			double ceiling = up ? 16 : 16 - gap;
 			double top = bottom + (ceiling - bottom) * level / 15.0;
-			sb.append(String.format(Locale.ROOT, ",\n\t\t{\n\t\t\t\"from\": [1, %.3f, 1],\n\t\t\t\"to\": [15, %.3f, 15],\n\t\t\t\"faces\": {\n", bottom, top));
+			sb.append(String.format(Locale.ROOT, ",\n\t\t{\n\t\t\t\"from\": [%.3f, %.3f, %.3f],\n\t\t\t\"to\": [%.3f, %.3f, %.3f],\n\t\t\t\"faces\": {\n",
+				gap, bottom, gap, 16 - gap, top, 16 - gap));
 			StringBuilder water = new StringBuilder();
 			// a face de cima some quando a água emenda com a do tanque de cima
 			if (!(up && level == 15)) water.append("\t\t\t\t\"up\": { \"texture\": \"#water\" }");
