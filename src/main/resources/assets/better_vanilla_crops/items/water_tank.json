@@ -1,6 +1,118 @@
 {
 	"model": {
-		"type": "minecraft:model",
-		"model": "better_vanilla_crops:block/water_tank_single_15"
+		"type": "minecraft:select",
+		"property": "minecraft:block_state",
+		"block_state_property": "level",
+		"cases": [
+			{
+				"when": "1",
+				"model": {
+					"type": "minecraft:model",
+					"model": "better_vanilla_crops:block/water_tank_single_1"
+				}
+			},
+			{
+				"when": "2",
+				"model": {
+					"type": "minecraft:model",
+					"model": "better_vanilla_crops:block/water_tank_single_2"
+				}
+			},
+			{
+				"when": "3",
+				"model": {
+					"type": "minecraft:model",
+					"model": "better_vanilla_crops:block/water_tank_single_3"
+				}
+			},
+			{
+				"when": "4",
+				"model": {
+					"type": "minecraft:model",
+					"model": "better_vanilla_crops:block/water_tank_single_4"
+				}
+			},
+			{
+				"when": "5",
+				"model": {
+					"type": "minecraft:model",
+					"model": "better_vanilla_crops:block/water_tank_single_5"
+				}
+			},
+			{
+				"when": "6",
+				"model": {
+					"type": "minecraft:model",
+					"model": "better_vanilla_crops:block/water_tank_single_6"
+				}
+			},
+			{
+				"when": "7",
+				"model": {
+					"type": "minecraft:model",
+					"model": "better_vanilla_crops:block/water_tank_single_7"
+				}
+			},
+			{
+				"when": "8",
+				"model": {
+					"type": "minecraft:model",
+					"model": "better_vanilla_crops:block/water_tank_single_8"
+				}
+			},
+			{
+				"when": "9",
+				"model": {
+					"type": "minecraft:model",
+					"model": "better_vanilla_crops:block/water_tank_single_9"
+				}
+			},
+			{
+				"when": "10",
+				"model": {
+					"type": "minecraft:model",
+					"model": "better_vanilla_crops:block/water_tank_single_10"
+				}
+			},
+			{
+				"when": "11",
+				"model": {
+					"type": "minecraft:model",
+					"model": "better_vanilla_crops:block/water_tank_single_11"
+				}
+			},
+			{
+				"when": "12",
+				"model": {
+					"type": "minecraft:model",
+					"model": "better_vanilla_crops:block/water_tank_single_12"
+				}
+			},
+			{
+				"when": "13",
+				"model": {
+					"type": "minecraft:model",
+					"model": "better_vanilla_crops:block/water_tank_single_13"
+				}
+			},
+			{
+				"when": "14",
+				"model": {
+					"type": "minecraft:model",
+					"model": "better_vanilla_crops:block/water_tank_single_14"
+				}
+			},
+			{
+				"when": "15",
+				"model": {
+					"type": "minecraft:model",
+					"model": "better_vanilla_crops:block/water_tank_single_15"
+				}
+			}
+		],
+		"fallback": {
+			"type": "minecraft:model",
+			"model": "better_vanilla_crops:block/water_tank_single_0"
+		}
 	}
 }

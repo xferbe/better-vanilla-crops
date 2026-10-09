@@ -3,5 +3,6 @@
 	"block.better_vanilla_crops.sprinkler": "Sprinkler",
 	"subtitles.better_vanilla_crops.block.sprinkler.spray": "Sprinkler sprays",
 	"item.better_vanilla_crops.copper_bucket": "Copper Bucket",
-	"item.better_vanilla_crops.water_copper_bucket": "Water Copper Bucket"
+	"item.better_vanilla_crops.water_copper_bucket": "Water Copper Bucket",
+	"block.better_vanilla_crops.water_tank.full": "Water Tank (full)"
 }

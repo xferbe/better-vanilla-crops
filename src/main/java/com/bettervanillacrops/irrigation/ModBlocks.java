@@ -10,6 +10,12 @@ import com.mojang.serialization.Codec;
 
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.BlockItemStateProperties;
+import net.minecraft.world.item.component.TypedEntityData;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -59,6 +65,7 @@ public final class ModBlocks {
 	public static void init() {
 		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(out -> {
 			out.accept(WATER_TANK);
+			out.accept(fullTank());
 			out.accept(SPRINKLER);
 		});
 		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(out -> {
@@ -72,6 +79,17 @@ public final class ModBlocks {
 		ResourceKey<Item> itemKey = ResourceKey.create(Registries.ITEM, BetterVanillaCrops.id(name));
 		Registry.register(BuiltInRegistries.ITEM, itemKey, new BlockItem(block, new Item.Properties().setId(itemKey).useBlockDescriptionPrefix()));
 		return block;
+	}
+
+	/** Tanque já cheio (5 baldes), para o criativo: põe a água no bloco ao colocar e mostra cheio no inventário. */
+	public static ItemStack fullTank() {
+		ItemStack stack = new ItemStack(WATER_TANK);
+		stack.set(DataComponents.BLOCK_STATE, new BlockItemStateProperties(java.util.Map.of("level", "15")));
+		CompoundTag water = new CompoundTag();
+		water.putLong("water", WaterTankBlockEntity.CAPACITY);
+		stack.set(DataComponents.BLOCK_ENTITY_DATA, TypedEntityData.of(WATER_TANK_ENTITY, water));
+		stack.set(DataComponents.ITEM_NAME, Component.translatable("block.better_vanilla_crops.water_tank.full"));
+		return stack;
 	}
 
 	private static Item item(String name, Function<Item.Properties, Item> factory) {
